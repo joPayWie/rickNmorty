@@ -28,7 +28,6 @@ const filterChar = () => {
         status: radioBtnChecked($$(".status-radio")) ? radioBtnChecked($$(".status-radio")) : '',
         gender: radioBtnChecked($$(".gender-radio")) ? radioBtnChecked($$(".gender-radio")) : '',
     })
-    console.log(params.toString())
     return params.toString()
 }
 
@@ -90,24 +89,23 @@ $("#btn-reset").addEventListener("click", () => {
 const nextPage = () => {
     page = page + 1
     for ( const prevBtn of $$(".prev") ) {
-        prevBtn.removeAttribute("disabled")
-         }
+            prevBtn.removeAttribute("disabled")
+        }
     if ( page === totalPages ) {
         for ( const nextBtn of $$(".next") ) {
            nextBtn.setAttribute("disabled", true)
         }
     }
-    return console.log(page)
 }
 
 const prevPage = () => {
     if ( page > 1 ) {
         page = page - 1
-    } else if ( page === 1 ) {
-        console.log(page)
+    } 
+    if (page === 1) {
         for ( const prevBtn of $$(".prev") ) {
-        prevBtn.setAttribute("disabled", true)
-         }
+            prevBtn.setAttribute("disabled", true)
+        }
     }
 }
 
@@ -131,4 +129,6 @@ for ( const nextBtn of $$(".next") ) {
     })
 }
 
-prevPage()
+for ( const prevBtn of $$(".prev") ) {
+    prevBtn.setAttribute("disabled", true)
+}
