@@ -7,13 +7,32 @@ let page = 1
 
 let totalPages
 
-const getCharacters = async (page, endpoint = "") => {
-    const response = await fetch(`${BASE_URL}character/?page=${page}${endpoint}`)
+const getCharacters = async (endpoint = "") => {
+    const response = await fetch(`${BASE_URL}character/?${endpoint}`)
     const info = await response.json()
     return info
 }
 
-getCharacters(page).then(data => { 
+const radioBtnChecked = (radioBtns) => {
+    for (const btn of radioBtns) {
+        if (btn.checked) {
+            return btn.value
+        }
+    }
+}
+
+const filterChar = () => {
+    let params = new URLSearchParams({
+        page: page,
+        name: $("#character-name").value,
+        status: radioBtnChecked($$(".status-radio")) ? radioBtnChecked($$(".status-radio")) : '',
+        gender: radioBtnChecked($$(".gender-radio")) ? radioBtnChecked($$(".gender-radio")) : '',
+    })
+    console.log(params.toString())
+    return params.toString()
+}
+
+getCharacters(filterChar()).then(data => { 
     renderCharacters(data.results)
     totalPages = data.info.pages
 }).catch(err => {   
@@ -45,22 +64,15 @@ const renderCharacters = (characters) => {
     }
 }
 
-const radioBtnChecked = (radioBtns) => {
-    for (const btn of radioBtns) {
-        if (btn.checked) {
-            return btn.value
-        }
-    }
-}
 
-const filterChar = () => {
-    return `&name=${$("#character-name").value}&status=${radioBtnChecked($$(".status-radio")) ? radioBtnChecked($$(".status-radio")) : ''}&gender=${radioBtnChecked($$(".gender-radio")) ? radioBtnChecked($$(".gender-radio")) : ''}`
-}
+// const filterChar = () => {
+//     return `&name=${$("#character-name").value}&status=${radioBtnChecked($$(".status-radio")) ? radioBtnChecked($$(".status-radio")) : ''}&gender=${radioBtnChecked($$(".gender-radio")) ? radioBtnChecked($$(".gender-radio")) : ''}`
+// }
 
 
 $("form").addEventListener("submit", (e) => {
     e.preventDefault()
-    getCharacters(page, filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
+    getCharacters(filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
         $("#cards").innerHTML = "" 
         $("#error-p").innerHTML = "No se encontraron resultados"
     })
@@ -69,7 +81,7 @@ $("form").addEventListener("submit", (e) => {
 $("#btn-reset").addEventListener("click", () => {
     $("form").reset()
     $("#cards").innerHTML = ""
-    getCharacters(page).then(data => renderCharacters(data.results)).catch(err => {   
+    getCharacters(filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
         $("#cards").innerHTML = "" 
         $("#error-p").innerHTML = "No se encontraron resultados"
     })
@@ -85,35 +97,38 @@ const nextPage = () => {
            nextBtn.setAttribute("disabled", true)
         }
     }
+    return console.log(page)
 }
 
 const prevPage = () => {
     if ( page > 1 ) {
         page = page - 1
-    } else {
+    } else if ( page === 1 ) {
+        console.log(page)
         for ( const prevBtn of $$(".prev") ) {
         prevBtn.setAttribute("disabled", true)
          }
     }
-    
 }
 
 for ( const prevBtn of $$(".prev") ) {
     prevBtn.addEventListener("click", () => {
-        getCharacters(page, filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
+        prevPage()
+        getCharacters(filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
             $("#cards").innerHTML = "" 
             $("#error-p").innerHTML = "No se encontraron resultados"
         })
-        prevPage()
     })
 }
 
 for ( const nextBtn of $$(".next") ) {
     nextBtn.addEventListener("click", () => {
-        getCharacters(page, filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
+        nextPage()
+        getCharacters(filterChar()).then(data => renderCharacters(data.results)).catch(err => {   
             $("#cards").innerHTML = "" 
             $("#error-p").innerHTML = "No se encontraron resultados"
         })
-        nextPage()
     })
 }
+
+prevPage()
