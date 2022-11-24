@@ -107,7 +107,7 @@ const prevPage = () => {
         console.log(page)
         for ( const prevBtn of $$(".prev") ) {
         prevBtn.setAttribute("disabled", true)
-         }
+        }
     }
 }
 
